@@ -18,7 +18,7 @@ Route::prefix('admin')->group(function () {
                 ->name('admin.register')->middleware(CheckAdminISHeadAdmin::class);
 
     Route::post('register', [RegisteredAdminController::class, 'store'])
-                ->name('admin.register')->middleware(CheckGuest::class);
+                ->name('admin.register');
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
                 ->name('admin.login');
 

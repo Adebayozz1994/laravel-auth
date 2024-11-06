@@ -40,3 +40,4 @@ Route::put('password', [PasswordController::class, 'update'])->name('password.up
 Route::post('/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadPicture']);
 
 require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';
