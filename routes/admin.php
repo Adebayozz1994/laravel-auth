@@ -35,6 +35,7 @@ Route::prefix('admin')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
                 ->name('admin.password.store');
+    
     Route::post('get', [AuthenticatedSessionController::class, 'getAdmin']);
 });
 Route::post('/admin/getAdmin', [AuthenticatedSessionController::class, 'getAdmin']);
@@ -55,8 +56,11 @@ Route::prefix('admin')->group(function () {
                 ->name('password.confirm');
 
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
+    
+    Route::put('password', [PasswordController::class, 'updatePassword'])->name('password.update');
+    // Route::put('password', [PasswordController::class, 'updateAdminPassword'])->name('admin.password.update');
+    // Route::post('reset-password', [PasswordController::class, 'resetAdminPassword']);
 
-    Route::put('password', [PasswordController::class, 'updateAdminPassword'])->name('admin.password.update');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->name('admin.logout');

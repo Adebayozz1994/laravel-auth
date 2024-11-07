@@ -29,6 +29,7 @@ Route::get('/logout', function () {
     ]);
 })->middleware('auth:sanctum');
 
+
 Route::middleware('guest')->group(function () {
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
         ->name('password.reset'); // Ensure this route is defined
@@ -38,6 +39,10 @@ Route::middleware('guest')->group(function () {
 Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
 Route::post('/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadPicture']);
+
+// Route to update password by email
+// Route::put('admin/password/email', [PasswordController::class, 'updatePassword']);
+
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';

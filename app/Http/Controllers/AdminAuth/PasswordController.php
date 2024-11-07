@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AdminAuth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,18 +17,24 @@ class PasswordController extends Controller
     /**
      * Update the user's password.
      */
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request): JsonResponse
     {
         $validated = $request->validateWithBag('updatePassword', [
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::defaults(), 'confirmed'],
+            'current_password' => ['required', function ($attribute, $value, $fail) use ($request) {
+                if (!Hash::check($value, $request->user()->password)) {
+                    return $fail('The current password is incorrect.');
+                }
+            }],
+            'password' => ['required', 'string', Password::defaults(), 'confirmed'],
         ]);
 
         $request->user()->update([
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back()->with('status', 'password-updated');
+        // return back()->with('status', 'password-updated');
+        return response()->json(['status' => 'Password updated successfully!'], 200);
+
     }
 
     public function updateAdminPassword(Request $request): RedirectResponse {
@@ -50,4 +57,43 @@ class PasswordController extends Controller
         }
        
     }
+
+
+
+    public function updatePassword(Request $request)
+    {
+        // Step 1: Validate the token first
+        $admin = Admin::where('token', $request->token)->first();
+
+        if (!$admin) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid or expired token.'
+            ], 401);
+        }
+
+        // Step 2: Validate the password
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string|confirmed|min:8', // Validate new password
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Step 3: Update the password
+        $admin->update([
+            'password' => Hash::make($request->password) // Hash the new password
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password updated successfully.'
+        ]);
+    }
 }
+
+
