@@ -18,9 +18,11 @@ class NewPasswordController extends Controller
     /**
      * Display the password reset view.
      */
-    public function create(Request $request): View
+    public function create(Request $request): JsonResponse
     {
-        return view('adminauth.reset-password', ['request' => $request]);
+        // return view('adminauth.reset-password', ['request' => $request]);
+        return response()->json(['token' => $request->token], 200);
+
     }
 
     /**
@@ -59,8 +61,12 @@ class NewPasswordController extends Controller
     //                 : back()->withInput($request->only('email'))
     //                         ->withErrors(['email' => __($status)]);
     // }
-    return $status == Password::PASSWORD_RESET
-    ? response()->json(['status' => __('Password has been reset!')], 200)
-    : response()->json(['error' => __($status)], 400);
-}
+//     return $status == Password::PASSWORD_RESET
+//     ? response()->json(['status' => __('Password has been reset!')], 200)
+//     : response()->json(['error' => __($status)], 400);
+// }
+        return $status == Password::PASSWORD_RESET
+            ? response()->json(['status' => __('Password has been reset!')], 200)
+            : response()->json(['error' => __($status)], 400);
+    }
 }
