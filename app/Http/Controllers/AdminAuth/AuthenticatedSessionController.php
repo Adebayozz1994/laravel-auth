@@ -80,4 +80,50 @@ class AuthenticatedSessionController extends Controller
             'token' => time().$id
          ]);
     }
+
+
+    public function uploadPicture(Request $req)
+    {
+    // Validate the uploaded file
+    $req->validate([
+        'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:8048', // Only accept images under 2MB
+    ]);
+
+    // Retrieve the uploaded file and the user ID
+    $file = $req->file('profile_picture');
+    $userId = Auth::id();
+
+    // Create a unique name for the profile picture
+    $newProfilePicture = time() . $userId . '.' . $file->getClientOriginalExtension();
+
+    // Store the file in the "public/profile_pictures" directory
+    $storePicture = $file->storeAs('/profile_picture', $newProfilePicture,'public');
+
+    if ($storePicture) {
+        // Update the user profile picture path in the database
+        $updateProfilePic = Admin::where('id', $userId)->update([
+            'profile_picture' => $newProfilePicture,
+        ]);
+
+        // Check if the update was successful
+        if ($updateProfilePic) {
+            return redirect('/dashboard')->with([
+                'message' => 'Profile picture updated successfully!',
+                'status' => true,
+            ]);
+        } else {
+            return redirect('/dashboard')->with([
+                'message' => 'Failed to update profile picture in database.',
+                'status' => false,
+            ]);
+        }
+    }
+
+    // Fallback error message if picture couldn't be stored
+    return redirect('/dashboard')->with([
+        'message' => 'Failed to upload profile picture. Please try again.',
+        'status' => false,
+    ]);
+}
+
 }

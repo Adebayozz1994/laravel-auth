@@ -39,6 +39,8 @@ Route::middleware('guest')->group(function () {
 Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
 Route::post('/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadPicture']);
+Route::post('admin//uploadProfilePic',[AuthenticatedSessionController::class, 'uploadPicture']);
+
 
 // Route to update password by email
 // Route::put('admin/password/email', [PasswordController::class, 'updatePassword']);

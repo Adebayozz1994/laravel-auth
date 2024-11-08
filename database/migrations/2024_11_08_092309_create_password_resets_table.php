@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('password_resets', function (Blueprint $table) {
-            $table->id();
-            $table->string('email'); // Email of the user who requested the reset
-            $table->string('token'); // The reset token
+            $table->string('email')->index();
+            $table->string('token', 255);
             $table->timestamp('created_at')->nullable();
         });
     }
@@ -24,6 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('password_resets');
+        Schema::table('password_resets', function (Blueprint $table) {
+            //
+        });
     }
 };
