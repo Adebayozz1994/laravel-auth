@@ -42,7 +42,7 @@ Route::put('password', [PasswordController::class, 'update'])->name('password.up
 //         ->name('password.email');
 
 Route::post('/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadPicture']);
-Route::post('/admin/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadPicture']);
+
 
 
 // Route to update password by email

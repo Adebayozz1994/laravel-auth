@@ -41,27 +41,37 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request)
     {
-      $credentials = $request ->only('email','password');
-      if(Auth::guard('admin')->attempt($credentials)) {
-        $admin = Auth::guard('admin')->user();
-        $token = time().$admin->id;
-        Admin::where('email', $admin->email)->update([
-          'token' => $token
-        ]);
-        // return redirect('/admin/dashboard');
-        return response()->json([
-          'status' => true,
-          'token' => $token,
-          'role' => $admin->role,
-          
-        ]);
-      } else {
-        return response()->json([
-          'status' => false,
-          'error' => 'The provided credentials do not match our records.',
-        ]);
-      }
+        $credentials = $request->only('email', 'password');
+        if (Auth::guard('admin')->attempt($credentials)) {
+            $admin = Auth::guard('admin')->user();
+            $token = time() . $admin->id;
+            
+            // Update the token in the database
+            Admin::where('email', $admin->email)->update([
+                'token' => $token
+            ]);
+    
+            // Return the admin details, including formatted profile picture URL
+            return response()->json([
+                'status' => true,
+                'token' => $token,
+                'role' => $admin->role,
+                'admin' => [
+                    'id' => $admin->id,
+                    'name' => $admin->name,
+                    'email' => $admin->email,
+                    'role' => $admin->role,
+                    'profile_picture' => asset('storage/' . $admin->profile_picture)
+                ]
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'error' => 'The provided credentials do not match our records.',
+            ]);
+        }
     }
+    
 
     /**
      * Destroy an authenticated session.
@@ -84,46 +94,41 @@ class AuthenticatedSessionController extends Controller
 
     public function uploadPicture(Request $req)
     {
-    // Validate the uploaded file
-    $req->validate([
-        'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:8048', // Only accept images under 2MB
-    ]);
-
-    // Retrieve the uploaded file and the user ID
-    $file = $req->file('profile_picture');
-    $userId = Auth::id();
-
-    // Create a unique name for the profile picture
-    $newProfilePicture = time() . $userId . '.' . $file->getClientOriginalExtension();
-
-    // Store the file in the "public/profile_pictures" directory
-    $storePicture = $file->storeAs('/profile_picture', $newProfilePicture,'public');
-
-    if ($storePicture) {
-        // Update the user profile picture path in the database
-        $updateProfilePic = Admin::where('id', $userId)->update([
-            'profile_picture' => $newProfilePicture,
+        // Validate the uploaded file
+        $req->validate([
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:8048', // Only accept images under 8MB
         ]);
-
-        // Check if the update was successful
-        if ($updateProfilePic) {
-            return redirect('/admin/dashboard')->with([
-                'message' => 'Profile picture updated successfully!',
-                'status' => true,
+    
+        // Retrieve the uploaded file and the user ID
+        $file = $req->file('profile_picture');
+        $userId = Auth::guard('admin')->id();
+    
+        // Create a unique name for the profile picture
+        $newProfilePicture = time() . $userId . '.' . $file->getClientOriginalExtension();
+    
+        // Store the file in the "public/profile_picture" directory
+        $storePicture = $file->storeAs('profile_picture', $newProfilePicture, 'public');
+    
+        if ($storePicture) {
+            // Update the user profile picture path in the database
+            $updateProfilePic = Admin::where('id', $userId)->update([
+                'profile_picture' => $newProfilePicture, // Save relative path
             ]);
-        } else {
-            return redirect('/admin/dashboard')->with([
-                'message' => 'Failed to update profile picture in database.',
-                'status' => false,
+    
+            // Return success response (you can adjust as needed)
+            return response()->json([
+                'message' => 'Profile picture uploaded successfully!',
+                'status' => true,
+                'profile_picture_url' => asset('storage/profile_picture/' . $newProfilePicture), // This will be used to update the frontend
             ]);
         }
+    
+        // Return an error message if the upload fails
+        return response()->json([
+            'message' => 'Failed to upload profile picture. Please try again.',
+            'status' => false,
+        ]);
     }
-
-    // Fallback error message if picture couldn't be stored
-    return redirect('/admin/dashboard')->with([
-        'message' => 'Failed to upload profile picture. Please try again.',
-        'status' => false,
-    ]);
-}
+    
 
 }

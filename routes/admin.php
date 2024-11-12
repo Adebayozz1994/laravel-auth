@@ -36,9 +36,12 @@ Route::prefix('admin')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
                 ->name('admin.password.store');
     
-    Route::post('get', [AuthenticatedSessionController::class, 'getAdmin']);
+    // Route::post('get', [AuthenticatedSessionController::class, 'getAdmin']);
+    Route::post('/getAdmin', [AuthenticatedSessionController::class, 'getAdmin']);
+    
+    
+    Route::post('/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadPicture']);
 });
-Route::post('/admin/getAdmin', [AuthenticatedSessionController::class, 'getAdmin']);
 
 Route::prefix('admin')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)

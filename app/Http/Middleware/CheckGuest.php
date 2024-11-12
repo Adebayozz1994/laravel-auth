@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Admin;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,3 +23,5 @@ class CheckGuest
         return redirect()->route('admin.login');
     }
 }
+
+
