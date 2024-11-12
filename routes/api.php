@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminAuth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
@@ -37,9 +38,11 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::put('password', [PasswordController::class, 'update'])->name('password.update');
+// Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+//         ->name('password.email');
 
 Route::post('/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadPicture']);
-Route::post('admin//uploadProfilePic',[AuthenticatedSessionController::class, 'uploadPicture']);
+Route::post('/admin/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadPicture']);
 
 
 // Route to update password by email

@@ -22,13 +22,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        ResetPassword::createUrlUsing(function (User $user, string $token) {
+        ResetPassword::createUrlUsing(function ($notifiable, string $token) {
+            // Check if the model is an instance of Admin or User
+            if ($notifiable instanceof Admin) {
+                return 'http://localhost:2000/admin/reset-password/' . $token;
+            }
+            
+            // Default to user URL
             return 'http://localhost:2000/reset-password/' . $token;
         });
-
-          // URL for Admin password reset
-    ResetPassword::createUrlUsing(function (Admin $admin, string $token) {
-        return 'http://localhost:2000/admin/reset-password/' . $token;
-    });
     }
 }

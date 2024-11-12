@@ -107,12 +107,12 @@ class AuthenticatedSessionController extends Controller
 
         // Check if the update was successful
         if ($updateProfilePic) {
-            return redirect('/dashboard')->with([
+            return redirect('/admin/dashboard')->with([
                 'message' => 'Profile picture updated successfully!',
                 'status' => true,
             ]);
         } else {
-            return redirect('/dashboard')->with([
+            return redirect('/admin/dashboard')->with([
                 'message' => 'Failed to update profile picture in database.',
                 'status' => false,
             ]);
@@ -120,7 +120,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     // Fallback error message if picture couldn't be stored
-    return redirect('/dashboard')->with([
+    return redirect('/admin/dashboard')->with([
         'message' => 'Failed to upload profile picture. Please try again.',
         'status' => false,
     ]);
