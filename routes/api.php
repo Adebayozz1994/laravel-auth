@@ -48,12 +48,13 @@ Route::post('/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadP
 
 
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/news', [NewsController::class, 'index']);
-    Route::post('/news', [NewsController::class, 'store']);
-    Route::put('/news/{id}', [NewsController::class, 'update']);
-    Route::delete('/news/{id}', [NewsController::class, 'destroy']);
+Route::middleware(['auth:admin', \App\Http\Middleware\CheckAdminIsHeadAdmin::class])->group(function () {
+    Route::get('/admin/news', [NewsController::class, 'index']);
+    Route::post('/admin/news', [NewsController::class, 'store']);
+    Route::put('/admin/news/{id}', [NewsController::class, 'update']);
+    Route::delete('/admin/news/{id}', [NewsController::class, 'destroy']);
 });
+
 
 
 Route::get('/news', [NewsController::class, 'index']);
