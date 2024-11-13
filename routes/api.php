@@ -4,6 +4,9 @@ use App\Http\Controllers\AdminAuth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\NewsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -45,8 +48,15 @@ Route::post('/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadP
 
 
 
-// Route to update password by email
-// Route::put('admin/password/email', [PasswordController::class, 'updatePassword']);
+Route::middleware('auth:admin')->group(function () {
+    Route::post('/admin/news', [NewsController::class, 'store']);
+    Route::put('/admin/news/{id}', [NewsController::class, 'update']);
+    Route::delete('/admin/news/{id}', [NewsController::class, 'destroy']);
+});
+
+Route::get('/news', [NewsController::class, 'index']);
+Route::post('/news/{newsId}/like', [LikeController::class, 'toggleLike']);
+Route::post('/news/{newsId}/comment', [CommentController::class, 'store']);
 
 
 require __DIR__.'/auth.php';
