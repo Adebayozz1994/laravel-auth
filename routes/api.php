@@ -48,11 +48,13 @@ Route::post('/uploadProfilePic',[AuthenticatedSessionController::class, 'uploadP
 
 
 
-Route::middleware('auth:admin')->group(function () {
-    Route::post('/admin/news', [NewsController::class, 'store']);
-    Route::put('/admin/news/{id}', [NewsController::class, 'update']);
-    Route::delete('/admin/news/{id}', [NewsController::class, 'destroy']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/news', [NewsController::class, 'index']);
+    Route::post('/news', [NewsController::class, 'store']);
+    Route::put('/news/{id}', [NewsController::class, 'update']);
+    Route::delete('/news/{id}', [NewsController::class, 'destroy']);
 });
+
 
 Route::get('/news', [NewsController::class, 'index']);
 Route::post('/news/{newsId}/like', [LikeController::class, 'toggleLike']);
