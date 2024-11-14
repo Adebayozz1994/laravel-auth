@@ -9,41 +9,53 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
-   // In CommentController.php
-public function store(Request $request, $newsId)
-{
-    // Ensure the user is logged in before continuing
-    if (!Auth::check()) {
-        return response()->json(['error' => 'Unauthorized'], 401);
+    // In CommentController.php
+    public function index($newsId)
+    {
+        // Fetch the comments for the given news item, with the associated user data
+        $comments = Comment::where('news_id', $newsId)
+                           ->with('user')  // Eager load the 'user' relationship
+                           ->get()
+                           ->map(function ($comment) {
+                               $comment->user_name = $comment->user->name; // Add user_name
+                               return $comment;
+                           });
+
+        return response()->json($comments);
     }
 
-    // Validate the comment input
-    $request->validate(['comment' => 'required|string']);
+    public function store(Request $request, $newsId)
+    {
+        // Ensure the user is logged in before continuing
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
-    // Create the comment using the logged-in user's ID
-    $comment = Comment::create([
-        'news_id' => $newsId,
-        'user_id' => Auth::id(),
-        'comment' => $request->comment,
-    ]);
-    $comment->load('user');
-    // Retrieve all comments for the news post, including user information
-    $comments = Comment::where('news_id', $newsId)
-    ->with('user')  // Eager load the user relationship
-    ->get()
-    ->map(function ($comment) {
-        // Use the 'name' field for the full name
-        $comment->user_name = $comment->user->name;
-        return $comment;
-    });
+        // Validate the comment input
+        $request->validate(['comment' => 'required|string']);
 
-     // Corrected part here: Get the current user's name
-     $currentUserName = Auth::user()->name;
+        // Create the comment using the logged-in user's ID
+        $comment = Comment::create([
+            'news_id' => $newsId,
+            'user_id' => Auth::id(),
+            'comment' => $request->comment,
+        ]);
+        
+        // Load user data for the created comment
+        $comment->load('user');
+        
+        // Fetch all comments after adding the new comment
+        $comments = Comment::where('news_id', $newsId)
+                           ->with('user')
+                           ->get()
+                           ->map(function ($comment) {
+                               $comment->user_name = $comment->user->name;
+                               return $comment;
+                           });
 
-     return response()->json([
-        'comment' => $comment,
-        'comments' => $comments,
-        'user_name' => Auth::user()->name,  // Correct way to get the user's name
-    ], 201);
-}
+        return response()->json([
+            'comment' => $comment,  // Return the newly added comment
+            'comments' => $comments,  // Return all comments for the news item
+        ], 201);
+    }
 }

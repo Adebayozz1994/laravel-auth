@@ -60,6 +60,7 @@ Route::middleware(['auth:admin', \App\Http\Middleware\CheckAdminIsHeadAdmin::cla
 Route::get('/news', [NewsController::class, 'index']);
 Route::post('/news/{newsId}/like', [LikeController::class, 'toggleLike']);
 Route::post('/news/{newsId}/comment', [CommentController::class, 'store']);
+Route::get('news/{newsId}/comment', [CommentController::class, 'index']);
 
 
 require __DIR__.'/auth.php';

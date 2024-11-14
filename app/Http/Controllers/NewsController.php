@@ -19,8 +19,17 @@ class NewsController extends Controller
     // Fetch all news items with their comments and likes
     public function index()
     {
-        return News::with(['comments.user', 'likes'])->get();
+        // Fetch all news items with their associated comments and likes
+        return News::withCount(['comments', 'likes']) // Get counts for comments and likes
+            ->get()
+            ->map(function ($news) {
+                // Add extra fields for likes and comments count
+                $news->likeCount = $news->likes_count;
+                $news->commentCount = $news->comments_count;
+                return $news;
+            });
     }
+    
 
     // Store a new news post (only for authenticated admins)
     public function store(Request $request)
