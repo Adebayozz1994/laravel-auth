@@ -9,7 +9,12 @@ class News extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'content', 'author'];
+    protected $fillable = [
+        'title',
+        'content',
+        'author',
+        'image_path',
+    ];
 
     public function comments()
     {

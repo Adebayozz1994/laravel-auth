@@ -26,36 +26,31 @@ class CommentController extends Controller
 
     public function store(Request $request, $newsId)
     {
-        // Ensure the user is logged in before continuing
+        // Ensure the user is logged in
         if (!Auth::check()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
+    
         // Validate the comment input
         $request->validate(['comment' => 'required|string']);
-
+    
         // Create the comment using the logged-in user's ID
         $comment = Comment::create([
             'news_id' => $newsId,
             'user_id' => Auth::id(),
             'comment' => $request->comment,
         ]);
-        
-        // Load user data for the created comment
+    
+        // Load the user data for the newly created comment
         $comment->load('user');
-        
-        // Fetch all comments after adding the new comment
-        $comments = Comment::where('news_id', $newsId)
-                           ->with('user')
-                           ->get()
-                           ->map(function ($comment) {
-                               $comment->user_name = $comment->user->name;
-                               return $comment;
-                           });
-
+    
+        // Add the user_name to the response
+        $comment->user_name = $comment->user->name;
+    
+        // Return the new comment with the user_name
         return response()->json([
-            'comment' => $comment,  // Return the newly added comment
-            'comments' => $comments,  // Return all comments for the news item
+            'comment' => $comment, // Newly added comment with user_name
         ], 201);
     }
+    
 }
